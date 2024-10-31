@@ -145,7 +145,7 @@ table {
   .end-div{
     display:flex;
     flex-direction: column;
-    width: 50px;
+    width: 100px;
   }
 
   #tableau-button{
