@@ -44,7 +44,8 @@ let groupResults = [{}]; // Rank after pools = groupResults[i]. (starts from 1)
 
 
 let fencersRanks = [];
-let matches = [];
+
+
 
 
 function createGroupResults(){
@@ -413,8 +414,10 @@ function calculateResults(button){
 
     const tableauButton = document.createElement("button");
     tableauButton.setAttribute("id","tableau-button");
+    tableauButton.setAttribute("onclick","generateTournamentMatches()");
     document.body.append(tableauButton);
     document.getElementById("tableau-button").innerHTML = "Create tableau";
+    
 }
 
 
@@ -437,3 +440,121 @@ function nearestPowerOfTwo(){
     numberOfByes = tableauSize - totalFencers;
 }
 
+
+
+function generateTournamentMatches() {
+    document.getElementById("tableau-button").setAttribute("disabled","true");
+    nearestPowerOfTwo();
+    let matches = [];
+    
+    // Create array of standard tournament seeding pattern
+    let seedPattern = generateSeedPattern(tableauSize);
+    
+    // Generate matches based on seed pattern
+    for (let i = 0; i < seedPattern.length; i += 2) {
+        let seed1 = seedPattern[i];
+        let seed2 = seedPattern[i + 1];
+        
+        let fencer1 = groupResults[seed1] || { name: "BYE" };
+        let fencer2 = groupResults[seed2] || { name: "BYE" };
+        
+        matches.push({
+            matchNumber: (i/2) + 1,
+            fencer1: fencer1.name,
+            fencer2: fencer2.name,
+            seed1: seed1,
+            seed2: seed2
+        });
+    }
+
+    createTableauDisplay(matches);
+}
+
+function generateSeedPattern(size) {
+    // Returns array of seeds in standard tournament bracket order
+    if (size === 2) return [1, 2];
+    if (size === 4) return [1, 4, 2, 3];
+    if (size === 8) return [1, 8, 4, 5, 2, 7, 3, 6];
+    if (size === 16) return [1, 16, 8, 9, 4, 13, 5, 12, 2, 15, 7, 10, 3, 14, 6, 11];
+    if (size === 32) {
+        return [
+            1, 32, 16, 17, 8, 25, 9, 24, 4, 29, 13, 20, 5, 28, 12, 21,
+            2, 31, 15, 18, 7, 26, 10, 23, 3, 30, 14, 19, 6, 27, 11, 22
+        ];
+    }
+    // Add more sizes if needed
+    return [];
+}
+
+function createTableauDisplay(matches) {
+    const container = document.createElement("div");
+    container.classList.add("tableau-container");
+    
+    const title = document.createElement("h2");
+    title.textContent = `Tableau of ${tableauSize}`;
+    container.appendChild(title);
+    
+    const matchesList = document.createElement("div");
+    matchesList.classList.add("matches-list");
+    
+    matches.forEach(match => {
+        const matchDiv = document.createElement("div");
+        matchDiv.classList.add("match-pair");
+        matchDiv.innerHTML = `
+            <div class="match-number">${match.matchNumber}</div>
+            <div class="fencer-pair">
+                <div class="fencer">${match.seed1}. ${match.fencer1}</div>
+                <div class="fencer">${match.seed2}. ${match.fencer2}</div>
+            </div>
+        `;
+        matchesList.appendChild(matchDiv);
+    });
+    
+    container.appendChild(matchesList);
+    document.body.appendChild(container);
+}
+
+// Add CSS for tableau display
+const style = document.createElement('style');
+style.textContent = `
+    .tableau-container {
+        margin: 20px;
+        padding: 20px;
+        border: 1px solid #ccc;
+    }
+    
+    .matches-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .match-pair {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .match-number {
+        font-weight: bold;
+        width: 30px;
+    }
+    
+    .fencer-pair {
+        border: 1px solid #999;
+        padding: 5px;
+    }
+    
+    .fencer {
+        padding: 5px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .fencer:last-child {
+        border-bottom: none;
+    }
+`;
+document.head.appendChild(style);
+
+// Modify the existing tableau button click handler
+document.getElementById("tableau-button").onclick = generateTournamentMatches;
