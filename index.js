@@ -17,9 +17,18 @@ Specific score: group-1-row-1-col-1
 
 
 
+/* 
+#
+#
+############### GROUP & GROUP CALCULATOR FUNCTIONS #####################
+#
+#
+*/
 
 let groupNumber = 0;
 let totalFencers = 0;
+let tableauSize = 0;
+let numberOfByes = 0;
 
 let fencersInEachGroup = [];
 
@@ -31,49 +40,14 @@ let percentages = [];
 let plusMinus = [];
 let touchesFor = [];
 let touchesAgainst = [];
-let groupResults = [];
+let groupResults = [{}]; // Rank after pools = groupResults[i]. (starts from 1)
+
+
+let fencersRanks = [];
+let matches = [];
+
 
 function createGroupResults(){
-
-  /*  for (let h=0; h<groupNumber;h++){
-        let currentGroupNumberFencers = fencersInEachGroup[h].value;
-        
-        for (let i=0;i<totalFencers;i++){
-            groupResults[i+1]={
-                name: names[h+1][i+1],
-                wins: wins[h+1][i+1],
-                matches: numberOfMatches[h+1][i+1],
-                winPercentage: percentages[h+1][i+1],
-                touchesF: touchesFor[h+1][i+1],
-                touchesA: touchesAgainst[h+1][i+1],
-                PM: plusMinus[h+1][i+1]
-                
-            }
-        }
-    }*/
-
-    /*for (let i =0;i<totalFencers;i++){
-
-        groupResults[i+1]=[];
-        
-        for(let j = 0; j<groupNumber;j++){
-         
-            let currentGroupNumberFencers = fencersInEachGroup[j].value;
-         
-            for (let k = 0; k<currentGroupNumberFencers;k++){
-                groupResults[i+1]={
-                    name: names[j+1][k+1],
-                    wins: wins[j+1][k+1],
-                    matches: numberOfMatches[j+1][k+1],
-                    winPercentage: percentages[j+1][k+1],
-                    touchesF: touchesFor[j+1][k+1],
-                    touchesA: touchesAgainst[j+1][k+1],
-                    PM: plusMinus[j+1][k+1]
-                
-                }
-            }
-        }
-    }*/
 
     for (let h = 0; h<groupNumber;h++){
         let currentGroupNumberFencers = fencersInEachGroup[h].value
@@ -91,7 +65,6 @@ function createGroupResults(){
     }
 
 }
-
 
 function sortGroupResults(){
 
@@ -115,8 +88,6 @@ function sortGroupResults(){
     })
 
 }
-
-
 
 function createRankingTable(){
 
@@ -162,14 +133,11 @@ function createRankingTable(){
             let tdValue = document.createElement("td");
             tdValue.setAttribute("id",`tdvalue-${i}-${j}`);
             tr.append(tdValue);
-            document.getElementById(`tdvalue-${i}-${j}`).innerText = groupResults[i][valueNames[j]];
+            document.getElementById(`tdvalue-${i}-${j}`).innerText = groupResults[i+1][valueNames[j]];
         }
     }
 
 }
-
-//h = group; i=row; j=column
-
 
 function calculateWinPercentage(){
 
@@ -201,7 +169,6 @@ function calculateWinPercentage(){
 
 }
 
-
 function calculatePlusMinus(){
 
 
@@ -219,7 +186,7 @@ function calculatePlusMinus(){
             for (let j =0; j<currentGroupNumberFencers;j++){
                 if (i !== j){
                     touchesFor[h+1][i+1]+=scores[h+1][i+1][j+1]*1;
-                    touchesAgainst[h+1][i+1]=scores[h+1][j+1][i+1]*1;
+                    touchesAgainst[h+1][i+1]+=scores[h+1][j+1][i+1]*1;
                 }
                 
             }
@@ -233,8 +200,6 @@ function calculatePlusMinus(){
 
 
 }
-
-
 
 function storeNames(){
 
@@ -251,7 +216,6 @@ function storeNames(){
     }
 
 }
-
 
 function storeScores(){  
 
@@ -434,9 +398,6 @@ function validateGroupInput(input){
     }
 }
 
-
-
-
 function calculateResults(button){
     button.toggleAttribute("disabled");
     document.getElementById("generate-group-button").toggleAttribute("disabled");
@@ -455,3 +416,24 @@ function calculateResults(button){
     document.body.append(tableauButton);
     document.getElementById("tableau-button").innerHTML = "Create tableau";
 }
+
+
+
+/*################################ */
+
+
+function nearestPowerOfTwo(){
+
+    let power = 0;
+    let powerOfTwo = 2**power;
+
+
+    while (powerOfTwo < totalFencers){
+        power++;
+        powerOfTwo = 2**power;
+    };
+
+    tableauSize = powerOfTwo;
+    numberOfByes = tableauSize - totalFencers;
+}
+
